@@ -1,0 +1,74 @@
+---
+
+- hosts: localhost
+  become: yes
+  become_method: sudo
+
+  tasks:
+    - name: refresh apt cache
+      apt:
+        update_cache: true
+  
+    - name: install Python 2 latest version
+      apt: 
+        name: python
+        state: latest
+ 
+    - name: install pip latest version
+      apt: 
+        name: python-pip
+        state: latest
+
+    - name: update pip to latest version (using pip)
+      pip: 
+        executable: pip
+        name: pip
+        state: latest
+
+    - name: install Python 3 latest version
+      apt: 
+        name: python3
+        state: latest
+
+    - name: install pip3 latest version
+      apt: 
+        name: python3-pip
+        state: latest
+
+    - name: update pip3 to latest version (using pip)
+      pip: 
+        executable: pip3
+        name: pip
+        state: latest
+ 
+    - name: install virtualenv
+      pip: 
+        executable: pip
+        name: virtualenv
+        state: latest
+
+    - name: install virtualenvwrapper
+      pip: 
+        executable: pip
+        name: virtualenvwrapper
+        state: latest
+
+    - name: create dir for virtualenv projects home
+      become: false      
+      file:
+        name: ~/dev
+        state: directory
+        mode: ug=rwx,o=
+
+    - name: insert virtualenvwrapper configuration and initialization in .profile 
+      become: false    
+      blockinfile:
+        dest: ~/.bashrc
+        create: true
+        insertafter: EOF
+        marker: "# {mark} Virtualenvwrapper configuration ANSIBLE MANAGED BLOCK"
+        content: |
+          export WORKON_HOME=$HOME/.virtualenvs
+          export PROJECT_HOME=$HOME/dev
+          source /usr/local/bin/virtualenvwrapper.sh
+
